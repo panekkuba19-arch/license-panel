@@ -3,90 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MncraftCore - Panel Licencji</title>
+    <title>Panel Licencji MnCraftCore</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .login-box {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        .login-box h1 {
-            color: #667eea;
-            margin-bottom: 30px;
-            font-size: 2em;
-        }
-
-        .login-box input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-
-        .login-box input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .login-box button {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .login-box button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .login-error {
-            color: #dc3545;
-            margin-top: 15px;
-            font-weight: 600;
-        }
-
-        #mainPanel {
-            display: none;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
+        
+        .container { max-width: 1200px; margin: 0 auto; }
+        
         h1 {
             color: white;
             text-align: center;
@@ -94,89 +23,58 @@
             font-size: 2.5em;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
-
-        .logout-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            background: rgba(220, 53, 69, 0.9);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            z-index: 1000;
-        }
-
-        .logout-btn:hover {
-            background: rgba(200, 35, 51, 1);
-        }
-
+        
         .api-url {
             background: rgba(255,255,255,0.2);
             padding: 15px;
             border-radius: 10px;
             color: white;
-            text-align: center;
             margin-bottom: 30px;
-            font-size: 14px;
         }
-
+        
         .api-url input {
             width: 100%;
             padding: 10px;
             border: none;
             border-radius: 5px;
-            font-size: 14px;
             margin-top: 10px;
         }
-
+        
         .cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
-
+        
         .card {
             background: white;
             padding: 25px;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
-
-        .card h2 {
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
+        
+        .card h2 { color: #667eea; margin-bottom: 20px; }
+        
+        .form-group { margin-bottom: 15px; }
+        
         label {
             display: block;
             margin-bottom: 5px;
             color: #333;
             font-weight: 600;
         }
-
-        input, select {
+        
+        input {
             width: 100%;
             padding: 12px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 14px;
-            transition: border 0.3s;
         }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
+        
+        input:focus { outline: none; border-color: #667eea; }
+        
         button {
             width: 100%;
             padding: 12px;
@@ -189,97 +87,9 @@
             cursor: pointer;
             transition: transform 0.2s;
         }
-
-        button:hover {
-            transform: translateY(-2px);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        .license-list {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .license-item {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            border-left: 5px solid #667eea;
-        }
-
-        .license-item.disabled {
-            border-left-color: #dc3545;
-            opacity: 0.7;
-        }
-
-        .license-item h3 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .license-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .license-info p {
-            margin: 5px 0;
-            color: #666;
-        }
-
-        .license-info strong {
-            color: #333;
-        }
-
-        .status {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status.active {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status.disabled {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .alert.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .alert.show {
-            display: block;
-        }
-
+        
+        button:hover { transform: translateY(-2px); }
+        
         .generated-key {
             background: #e7f3ff;
             padding: 15px;
@@ -287,111 +97,101 @@
             margin-top: 15px;
             word-break: break-all;
         }
-
-        .generated-key strong {
-            color: #004085;
+        
+        .verify-result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
         }
-
-        .loading {
-            text-align: center;
-            color: #666;
+        
+        .verify-result.success { background: #d4edda; color: #155724; }
+        .verify-result.error { background: #f8d7da; color: #721c24; }
+        
+        .license-list {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .license-item {
+            background: #f8f9fa;
             padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 5px solid #667eea;
         }
+        
+        .license-item h3 {
+            font-family: monospace;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert.show { display: block; }
+        .alert.success { background: #d4edda; color: #155724; }
+        .alert.error { background: #f8d7da; color: #721c24; }
     </style>
 </head>
 <body>
-    <div id="loginScreen" class="login-container">
-        <div class="login-box">
-            <h1>🔐 Panel Licencji</h1>
-            <p style="color: #666; margin-bottom: 20px;">Wprowadź hasło aby uzyskać dostęp</p>
-            <input type="password" id="passwordInput" placeholder="Hasło" onkeypress="if(event.key==='Enter') checkPassword()">
-            <button onclick="checkPassword()">🔓 Zaloguj się</button>
-            <p id="loginError" class="login-error"></p>
+    <div class="container">
+        <h1>🔐 Panel Licencji MnCraftCore</h1>
+
+        <div class="api-url">
+            <strong>🌐 API URL:</strong>
+            <input type="text" id="apiUrl" value="https://mncraftcore-license-api.onrender.com">
         </div>
-    </div>
 
-    <div id="mainPanel">
-        <button class="logout-btn" onclick="logout()">🚪 Wyloguj</button>
+        <div id="alertBox" class="alert"></div>
 
-        <div class="container">
-            <h1>🔐 MncraftCore - Panel Licencji</h1>
-
-            <div class="api-url">
-                <strong>🌐 API URL:</strong>
-                <input type="text" id="apiUrl" value="https://mncraftcore-license-api.onrender.com" placeholder="https://twoj-api.com">
+        <div class="cards">
+            <div class="card">
+                <h2>🔑 Wygeneruj Klucz Licencji</h2>
+                <button onclick="generateKey()">Generuj Nowy Klucz</button>
+                <div id="generatedKey"></div>
             </div>
 
-            <div id="alertBox" class="alert"></div>
-
-            <div class="cards">
-                <div class="card">
-                    <h2>🔑 Wygeneruj Klucz Licencji</h2>
-                    <p style="color: #666; margin-bottom: 15px;">Kliknij aby wygenerować nowy unikalny klucz</p>
-                    <button onclick="generateKey()">Generuj Nowy Klucz</button>
-                    <div id="generatedKey"></div>
-                </div>
-
-                <div class="card">
-                    <h2>🔍 Sprawdź/Zweryfikuj Licencję</h2>
-                    <form id="verifyLicenseForm">
-                        <div class="form-group">
-                            <label>Klucz Licencji:</label>
-                            <input type="text" id="verifyKey" placeholder="XXXX-XXXX-XXXX-XXXX" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Server ID (opcjonalnie):</label>
-                            <input type="text" id="verifyServerId" placeholder="server-001">
-                        </div>
-                        <button type="submit">Zweryfikuj</button>
-                    </form>
-                    <div id="verifyResult" style="margin-top: 15px;"></div>
-                </div>
+            <div class="card">
+                <h2>🔍 Sprawdź Licencję</h2>
+                <form onsubmit="verifyLicense(event)">
+                    <div class="form-group">
+                        <label>Klucz Licencji:</label>
+                        <input type="text" id="verifyKey" required>
+                    </div>
+                    <button type="submit">Zweryfikuj</button>
+                </form>
+                <div id="verifyResult"></div>
             </div>
+        </div>
 
-            <div class="license-list">
-                <h2 style="color: #667eea; margin-bottom: 20px;">📋 Wszystkie Licencje</h2>
-                <button onclick="loadLicenses()" style="margin-bottom: 20px; width: auto; padding: 10px 30px;">
-                    🔄 Odśwież Listę
-                </button>
-                <div id="licensesList">
-                    <p class="loading">Ładowanie...</p>
-                </div>
-            </div>
+        <div class="license-list">
+            <h2 style="color: #667eea; margin-bottom: 20px;">📋 Wszystkie Licencje</h2>
+            <button onclick="loadLicenses()" style="width: auto; padding: 10px 30px; margin-bottom: 20px;">
+                🔄 Odśwież Listę
+            </button>
+            <div id="licensesList">Ładowanie...</div>
         </div>
     </div>
 
     <script>
-        const CORRECT_PASSWORD = "niewiem123456";
         const getApiUrl = () => document.getElementById('apiUrl').value;
-
-        if (sessionStorage.getItem('loggedIn') === 'true') {
-            showMainPanel();
-        }
-
-        function checkPassword() {
-            const input = document.getElementById('passwordInput').value;
-            const errorDiv = document.getElementById('loginError');
-
-            if (input === CORRECT_PASSWORD) {
-                sessionStorage.setItem('loggedIn', 'true');
-                showMainPanel();
-            } else {
-                errorDiv.textContent = '❌ Nieprawidłowe hasło!';
-                document.getElementById('passwordInput').value = '';
-                document.getElementById('passwordInput').focus();
-            }
-        }
-
-        function showMainPanel() {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('mainPanel').style.display = 'block';
-            loadLicenses();
-        }
-
-        function logout() {
-            sessionStorage.removeItem('loggedIn');
-            location.reload();
-        }
 
         function showAlert(message, type = 'success') {
             const alertBox = document.getElementById('alertBox');
@@ -401,142 +201,101 @@
         }
 
         async function generateKey() {
-            try {
-                const response = await fetch(`${getApiUrl()}/api/generate-key`, {
-                    method: 'GET'
-                });
+            const keyDiv = document.getElementById('generatedKey');
+            keyDiv.innerHTML = '<p style="color: #666;">⏳ Generowanie...</p>';
 
+            try {
+                const response = await fetch(`${getApiUrl()}/api/generate-key`);
                 const result = await response.json();
-                const keyDiv = document.getElementById('generatedKey');
 
                 if (response.ok && result.license_key) {
                     keyDiv.innerHTML = `
                         <div class="generated-key">
-                            <strong>✅ Nowy Klucz Wygenerowany:</strong><br>
-                            <code style="font-size: 16px; font-weight: bold;">${result.license_key}</code>
+                            <strong>✅ Nowy Klucz:</strong><br>
+                            <code style="font-size: 18px; font-weight: bold;">${result.license_key}</code><br>
+                            <small style="color: #666; margin-top: 10px; display: block;">${result.message}</small>
                         </div>
                     `;
-                    showAlert('✅ Nowy klucz wygenerowany!', 'success');
-                    
+                    showAlert('✅ Klucz wygenerowany i zapisany!', 'success');
                     setTimeout(() => loadLicenses(), 1000);
                 } else {
-                    showAlert('❌ Błąd: ' + (result.error || 'Nie udało się wygenerować klucza'), 'error');
+                    keyDiv.innerHTML = `<p style="color: #dc3545;">❌ Błąd: ${result.error}</p>`;
+                    showAlert('❌ Błąd generowania', 'error');
                 }
             } catch (error) {
-                showAlert('❌ Błąd połączenia: ' + error.message, 'error');
+                keyDiv.innerHTML = `<p style="color: #dc3545;">❌ Błąd: ${error.message}</p>`;
+                showAlert('❌ Błąd połączenia', 'error');
             }
         }
 
-        document.getElementById('verifyLicenseForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const data = {
-                license_key: document.getElementById('verifyKey').value
-            };
-
-            const serverId = document.getElementById('verifyServerId').value;
-            if (serverId) {
-                data.server_id = serverId;
-            }
+        async function verifyLicense(event) {
+            event.preventDefault();
+            const key = document.getElementById('verifyKey').value;
+            const resultDiv = document.getElementById('verifyResult');
+            resultDiv.innerHTML = '<p style="color: #666;">⏳ Sprawdzanie...</p>';
 
             try {
                 const response = await fetch(`${getApiUrl()}/api/verify`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify({ license_key: key })
                 });
 
                 const result = await response.json();
-                const resultDiv = document.getElementById('verifyResult');
 
                 if (result.valid) {
                     resultDiv.innerHTML = `
-                        <div style="background: #d4edda; padding: 15px; border-radius: 8px; color: #155724;">
+                        <div class="verify-result success">
                             <strong>✅ Licencja Aktywna</strong><br>
-                            Status: ${result.message || 'Zweryfikowana'}<br>
-                            ${result.owner ? `Właściciel: ${result.owner}<br>` : ''}
-                            ${result.expires ? `Wygasa: ${result.expires}<br>` : ''}
-                            ${result.server_id ? `Server ID: ${result.server_id}` : ''}
+                            ${result.message}<br>
+                            Klucz: ${result.license_key}
                         </div>
                     `;
                 } else {
                     resultDiv.innerHTML = `
-                        <div style="background: #f8d7da; padding: 15px; border-radius: 8px; color: #721c24;">
+                        <div class="verify-result error">
                             <strong>❌ Licencja Nieaktywna</strong><br>
-                            Powód: ${result.message || result.error || 'Nieznany'}
+                            ${result.message}
                         </div>
                     `;
                 }
             } catch (error) {
-                showAlert('❌ Błąd: ' + error.message, 'error');
+                resultDiv.innerHTML = `
+                    <div class="verify-result error">
+                        <strong>❌ Błąd połączenia</strong><br>
+                        ${error.message}
+                    </div>
+                `;
             }
-        });
+        }
 
         async function loadLicenses() {
             const listDiv = document.getElementById('licensesList');
-            listDiv.innerHTML = '<p class="loading">⏳ Ładowanie licencji...</p>';
+            listDiv.innerHTML = '<p style="color: #666;">⏳ Ładowanie...</p>';
 
             try {
                 const response = await fetch(`${getApiUrl()}/api/licenses`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
+                const licenses = await response.json();
 
-                const result = await response.json();
-                
-                console.log('📦 Otrzymane dane z API:', result);
-                console.log('📊 Czy to array?', Array.isArray(result));
-
-                let licenses;
-                
-                if (Array.isArray(result)) {
-                    licenses = result;
-                } else if (result.licenses && Array.isArray(result.licenses)) {
-                    licenses = result.licenses;
-                } else if (result.error) {
-                    listDiv.innerHTML = `<p style="text-align: center; color: #dc3545;">❌ Błąd API: ${result.error}</p>`;
-                    return;
-                } else {
-                    console.error('❌ Nieoczekiwany format:', result);
-                    listDiv.innerHTML = `<p style="text-align: center; color: #dc3545;">❌ Nieoczekiwany format danych z API</p>`;
-                    return;
-                }
-
-                if (licenses.length > 0) {
-                    listDiv.innerHTML = licenses.map(lic => {
-                        const isActive = lic.active !== false && lic.active !== 0;
-                        const key = lic.license_key || lic.key || 'Brak klucza';
-                        
-                        return `
-                            <div class="license-item ${isActive ? '' : 'disabled'}">
-                                <h3>🔑 ${key}</h3>
-                                <div class="license-info">
-                                    <p><strong>Status:</strong> <span class="status ${isActive ? 'active' : 'disabled'}">${isActive ? 'Aktywna' : 'Nieaktywna'}</span></p>
-                                    ${lic.owner ? `<p><strong>Właściciel:</strong> ${lic.owner}</p>` : ''}
-                                    ${lic.server_id ? `<p><strong>Server ID:</strong> ${lic.server_id}</p>` : ''}
-                                    ${lic.expires ? `<p><strong>Wygasa:</strong> ${new Date(lic.expires).toLocaleDateString('pl-PL')}</p>` : ''}
-                                    ${lic.created_at ? `<p><strong>Utworzono:</strong> ${new Date(lic.created_at).toLocaleDateString('pl-PL')}</p>` : ''}
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-                    
+                if (Array.isArray(licenses) && licenses.length > 0) {
+                    listDiv.innerHTML = licenses.map(lic => `
+                        <div class="license-item">
+                            <h3>🔑 ${lic.license_key}</h3>
+                            <p><strong>Status:</strong> <span class="status">✅ Aktywna</span></p>
+                            <p><strong>Utworzono:</strong> ${new Date(lic.created_at).toLocaleString('pl-PL')}</p>
+                        </div>
+                    `).join('');
                     showAlert(`✅ Załadowano ${licenses.length} licencji`, 'success');
                 } else {
-                    listDiv.innerHTML = '<p style="text-align: center; color: #666;">📭 Brak licencji w systemie</p>';
+                    listDiv.innerHTML = '<p style="text-align: center; color: #666;">📭 Brak licencji</p>';
                 }
             } catch (error) {
-                console.error('❌ Błąd ładowania:', error);
-                listDiv.innerHTML = `
-                    <p style="text-align: center; color: #dc3545;">
-                        ❌ Błąd połączenia: ${error.message}<br>
-                        <small>Sprawdź czy API działa: <a href="${getApiUrl()}" target="_blank">${getApiUrl()}</a></small>
-                    </p>
-                `;
-                showAlert('❌ Błąd ładowania: ' + error.message, 'error');
+                listDiv.innerHTML = `<p style="color: #dc3545; text-align: center;">❌ Błąd: ${error.message}</p>`;
+                showAlert('❌ Błąd ładowania', 'error');
             }
         }
+
+        loadLicenses();
     </script>
 </body>
 </html>
