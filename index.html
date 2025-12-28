@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -292,10 +291,15 @@
         .generated-key strong {
             color: #004085;
         }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
     <div id="loginScreen" class="login-container">
         <div class="login-box">
             <h1>🔐 Panel Licencji</h1>
@@ -306,7 +310,6 @@
         </div>
     </div>
 
-    <!-- Main Panel -->
     <div id="mainPanel">
         <button class="logout-btn" onclick="logout()">🚪 Wyloguj</button>
 
@@ -321,7 +324,6 @@
             <div id="alertBox" class="alert"></div>
 
             <div class="cards">
-                <!-- Wygeneruj nowy klucz -->
                 <div class="card">
                     <h2>🔑 Wygeneruj Klucz Licencji</h2>
                     <p style="color: #666; margin-bottom: 15px;">Kliknij aby wygenerować nowy unikalny klucz</p>
@@ -329,7 +331,6 @@
                     <div id="generatedKey"></div>
                 </div>
 
-                <!-- Sprawdź licencję -->
                 <div class="card">
                     <h2>🔍 Sprawdź/Zweryfikuj Licencję</h2>
                     <form id="verifyLicenseForm">
@@ -347,20 +348,20 @@
                 </div>
             </div>
 
-            <!-- Lista licencji -->
             <div class="license-list">
                 <h2 style="color: #667eea; margin-bottom: 20px;">📋 Wszystkie Licencje</h2>
                 <button onclick="loadLicenses()" style="margin-bottom: 20px; width: auto; padding: 10px 30px;">
                     🔄 Odśwież Listę
                 </button>
-                <div id="licensesList"></div>
+                <div id="licensesList">
+                    <p class="loading">Ładowanie...</p>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         const CORRECT_PASSWORD = "niewiem123456";
-
         const getApiUrl = () => document.getElementById('apiUrl').value;
 
         if (sessionStorage.getItem('loggedIn') === 'true') {
@@ -399,7 +400,6 @@
             setTimeout(() => alertBox.classList.remove('show'), 5000);
         }
 
-        // Wygeneruj nowy klucz
         async function generateKey() {
             try {
                 const response = await fetch(`${getApiUrl()}/api/generate-key`, {
@@ -417,6 +417,8 @@
                         </div>
                     `;
                     showAlert('✅ Nowy klucz wygenerowany!', 'success');
+                    
+                    setTimeout(() => loadLicenses(), 1000);
                 } else {
                     showAlert('❌ Błąd: ' + (result.error || 'Nie udało się wygenerować klucza'), 'error');
                 }
@@ -425,7 +427,6 @@
             }
         }
 
-        // Zweryfikuj licencję
         document.getElementById('verifyLicenseForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -471,33 +472,68 @@
             }
         });
 
-        // Załaduj wszystkie licencje
         async function loadLicenses() {
+            const listDiv = document.getElementById('licensesList');
+            listDiv.innerHTML = '<p class="loading">⏳ Ładowanie licencji...</p>';
+
             try {
                 const response = await fetch(`${getApiUrl()}/api/licenses`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
                 const result = await response.json();
+                
+                console.log('📦 Otrzymane dane z API:', result);
+                console.log('📊 Czy to array?', Array.isArray(result));
 
-                const listDiv = document.getElementById('licensesList');
-
-                if (result.licenses && result.licenses.length > 0) {
-                    listDiv.innerHTML = result.licenses.map(lic => `
-                        <div class="license-item ${lic.active ? '' : 'disabled'}">
-                            <h3>🔑 ${lic.license_key || lic.key}</h3>
-                            <div class="license-info">
-                                <p><strong>Status:</strong> <span class="status ${lic.active ? 'active' : 'disabled'}">${lic.active ? 'Aktywna' : 'Nieaktywna'}</span></p>
-                                ${lic.owner ? `<p><strong>Właściciel:</strong> ${lic.owner}</p>` : ''}
-                                ${lic.server_id ? `<p><strong>Server ID:</strong> ${lic.server_id}</p>` : ''}
-                                ${lic.expires ? `<p><strong>Wygasa:</strong> ${lic.expires}</p>` : ''}
-                                ${lic.created_at ? `<p><strong>Utworzono:</strong> ${lic.created_at}</p>` : ''}
-                            </div>
-                        </div>
-                    `).join('');
+                let licenses;
+                
+                if (Array.isArray(result)) {
+                    licenses = result;
+                } else if (result.licenses && Array.isArray(result.licenses)) {
+                    licenses = result.licenses;
                 } else if (result.error) {
-                    listDiv.innerHTML = `<p style="text-align: center; color: #dc3545;">❌ Błąd: ${result.error}</p>`;
+                    listDiv.innerHTML = `<p style="text-align: center; color: #dc3545;">❌ Błąd API: ${result.error}</p>`;
+                    return;
                 } else {
-                    listDiv.innerHTML = '<p style="text-align: center; color: #666;">Brak licencji w systemie</p>';
+                    console.error('❌ Nieoczekiwany format:', result);
+                    listDiv.innerHTML = `<p style="text-align: center; color: #dc3545;">❌ Nieoczekiwany format danych z API</p>`;
+                    return;
+                }
+
+                if (licenses.length > 0) {
+                    listDiv.innerHTML = licenses.map(lic => {
+                        const isActive = lic.active !== false && lic.active !== 0;
+                        const key = lic.license_key || lic.key || 'Brak klucza';
+                        
+                        return `
+                            <div class="license-item ${isActive ? '' : 'disabled'}">
+                                <h3>🔑 ${key}</h3>
+                                <div class="license-info">
+                                    <p><strong>Status:</strong> <span class="status ${isActive ? 'active' : 'disabled'}">${isActive ? 'Aktywna' : 'Nieaktywna'}</span></p>
+                                    ${lic.owner ? `<p><strong>Właściciel:</strong> ${lic.owner}</p>` : ''}
+                                    ${lic.server_id ? `<p><strong>Server ID:</strong> ${lic.server_id}</p>` : ''}
+                                    ${lic.expires ? `<p><strong>Wygasa:</strong> ${new Date(lic.expires).toLocaleDateString('pl-PL')}</p>` : ''}
+                                    ${lic.created_at ? `<p><strong>Utworzono:</strong> ${new Date(lic.created_at).toLocaleDateString('pl-PL')}</p>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    showAlert(`✅ Załadowano ${licenses.length} licencji`, 'success');
+                } else {
+                    listDiv.innerHTML = '<p style="text-align: center; color: #666;">📭 Brak licencji w systemie</p>';
                 }
             } catch (error) {
+                console.error('❌ Błąd ładowania:', error);
+                listDiv.innerHTML = `
+                    <p style="text-align: center; color: #dc3545;">
+                        ❌ Błąd połączenia: ${error.message}<br>
+                        <small>Sprawdź czy API działa: <a href="${getApiUrl()}" target="_blank">${getApiUrl()}</a></small>
+                    </p>
+                `;
                 showAlert('❌ Błąd ładowania: ' + error.message, 'error');
             }
         }
