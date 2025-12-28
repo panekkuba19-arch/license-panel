@@ -18,7 +18,6 @@
             padding: 20px;
         }
 
-        /* Login Screen */
         .login-container {
             display: flex;
             justify-content: center;
@@ -79,7 +78,6 @@
             font-weight: 600;
         }
 
-        /* Main Panel (hidden by default) */
         #mainPanel {
             display: none;
         }
@@ -241,25 +239,6 @@
             color: #333;
         }
 
-        .license-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .license-actions button {
-            flex: 1;
-            padding: 8px;
-            font-size: 14px;
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
-        }
-
         .status {
             display: inline-block;
             padding: 5px 15px;
@@ -300,6 +279,18 @@
         .alert.show {
             display: block;
         }
+
+        .generated-key {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            word-break: break-all;
+        }
+
+        .generated-key strong {
+            color: #004085;
+        }
     </style>
 </head>
 <body>
@@ -329,69 +320,29 @@
             <div id="alertBox" class="alert"></div>
 
             <div class="cards">
-                <!-- Dodaj nową licencję -->
+                <!-- Wygeneruj nowy klucz -->
                 <div class="card">
-                    <h2>➕ Dodaj Licencję</h2>
-                    <form id="addLicenseForm">
-                        <div class="form-group">
-                            <label>Klucz Licencji:</label>
-                            <input type="text" id="licenseKey" placeholder="TEST-1234-5678-ABCD" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Server ID:</label>
-                            <input type="text" id="serverId" placeholder="test-server-001" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Właściciel:</label>
-                            <input type="text" id="owner" placeholder="Nazwa Firmy" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Data Wygaśnięcia:</label>
-                            <input type="date" id="expires" required>
-                        </div>
-                        <button type="submit">Dodaj Licencję</button>
-                    </form>
+                    <h2>🔑 Wygeneruj Klucz Licencji</h2>
+                    <p style="color: #666; margin-bottom: 15px;">Kliknij aby wygenerować nowy unikalny klucz</p>
+                    <button onclick="generateKey()">Generuj Nowy Klucz</button>
+                    <div id="generatedKey"></div>
                 </div>
 
                 <!-- Sprawdź licencję -->
                 <div class="card">
-                    <h2>🔍 Sprawdź Licencję</h2>
-                    <form id="checkLicenseForm">
+                    <h2>🔍 Sprawdź/Zweryfikuj Licencję</h2>
+                    <form id="verifyLicenseForm">
                         <div class="form-group">
                             <label>Klucz Licencji:</label>
-                            <input type="text" id="checkKey" placeholder="TEST-1234-5678-ABCD" required>
+                            <input type="text" id="verifyKey" placeholder="XXXX-XXXX-XXXX-XXXX" required>
                         </div>
                         <div class="form-group">
-                            <label>Server ID:</label>
-                            <input type="text" id="checkServerId" placeholder="test-server-001" required>
+                            <label>Server ID (opcjonalnie):</label>
+                            <input type="text" id="verifyServerId" placeholder="server-001">
                         </div>
-                        <button type="submit">Sprawdź</button>
+                        <button type="submit">Zweryfikuj</button>
                     </form>
-                    <div id="checkResult" style="margin-top: 15px;"></div>
-                </div>
-
-                <!-- Zarządzaj licencją -->
-                <div class="card">
-                    <h2>⚙️ Zarządzaj Licencją</h2>
-                    <form id="manageLicenseForm">
-                        <div class="form-group">
-                            <label>Klucz Licencji:</label>
-                            <input type="text" id="manageKey" placeholder="TEST-1234-5678-ABCD" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Akcja:</label>
-                            <select id="action" required>
-                                <option value="">-- Wybierz --</option>
-                                <option value="disable">Wyłącz</option>
-                                <option value="enable">Włącz</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Powód:</label>
-                            <input type="text" id="reason" placeholder="Np. Brak płatności">
-                        </div>
-                        <button type="submit">Wykonaj</button>
-                    </form>
+                    <div id="verifyResult" style="margin-top: 15px;"></div>
                 </div>
             </div>
 
@@ -407,10 +358,10 @@
     </div>
 
     <script>
-        // 🔐 ZMIEŃ TO HASŁO NA SWOJE!
         const CORRECT_PASSWORD = "niewiem123456";
 
-        // Sprawdź czy użytkownik jest zalogowany
+        const getApiUrl = () => document.getElementById('apiUrl').value;
+
         if (sessionStorage.getItem('loggedIn') === 'true') {
             showMainPanel();
         }
@@ -440,8 +391,6 @@
             location.reload();
         }
 
-        const getApiUrl = () => document.getElementById('apiUrl').value;
-
         function showAlert(message, type = 'success') {
             const alertBox = document.getElementById('alertBox');
             alertBox.textContent = message;
@@ -449,117 +398,73 @@
             setTimeout(() => alertBox.classList.remove('show'), 5000);
         }
 
-        // Ustaw domyślną datę (za 1 rok)
-        document.addEventListener('DOMContentLoaded', () => {
-            const expiresInput = document.getElementById('expires');
-            if (expiresInput) {
-                const nextYear = new Date();
-                nextYear.setFullYear(nextYear.getFullYear() + 1);
-                expiresInput.value = nextYear.toISOString().split('T')[0];
-            }
-        });
-
-        // Dodaj licencję
-        document.getElementById('addLicenseForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const data = {
-                license_key: document.getElementById('licenseKey').value,
-                server_id: document.getElementById('serverId').value,
-                owner: document.getElementById('owner').value,
-                expires: document.getElementById('expires').value
-            };
-
+        // Wygeneruj nowy klucz
+        async function generateKey() {
             try {
-                const response = await fetch(`${getApiUrl()}/api/admin/add-license`, {
+                const response = await fetch(`${getApiUrl()}/api/generate-key`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
+                    headers: { 'Content-Type': 'application/json' }
                 });
 
                 const result = await response.json();
+                const keyDiv = document.getElementById('generatedKey');
 
-                if (response.ok) {
-                    showAlert('✅ Licencja dodana pomyślnie!', 'success');
-                    e.target.reset();
-                    loadLicenses();
+                if (response.ok && result.license_key) {
+                    keyDiv.innerHTML = `
+                        <div class="generated-key">
+                            <strong>✅ Nowy Klucz Wygenerowany:</strong><br>
+                            <code style="font-size: 16px; font-weight: bold;">${result.license_key}</code>
+                        </div>
+                    `;
+                    showAlert('✅ Nowy klucz wygenerowany!', 'success');
                 } else {
-                    showAlert('❌ Błąd: ' + result.error, 'error');
+                    showAlert('❌ Błąd: ' + (result.error || 'Nie udało się wygenerować klucza'), 'error');
                 }
             } catch (error) {
                 showAlert('❌ Błąd połączenia: ' + error.message, 'error');
             }
-        });
+        }
 
-        // Sprawdź licencję
-        document.getElementById('checkLicenseForm').addEventListener('submit', async (e) => {
+        // Zweryfikuj licencję
+        document.getElementById('verifyLicenseForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const data = {
-                license_key: document.getElementById('checkKey').value,
-                server_id: document.getElementById('checkServerId').value
+                license_key: document.getElementById('verifyKey').value
             };
 
+            const serverId = document.getElementById('verifyServerId').value;
+            if (serverId) {
+                data.server_id = serverId;
+            }
+
             try {
-                const response = await fetch(`${getApiUrl()}/api/license/check`, {
+                const response = await fetch(`${getApiUrl()}/api/verify`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
 
                 const result = await response.json();
-                const resultDiv = document.getElementById('checkResult');
+                const resultDiv = document.getElementById('verifyResult');
 
                 if (result.valid) {
                     resultDiv.innerHTML = `
                         <div style="background: #d4edda; padding: 15px; border-radius: 8px; color: #155724;">
                             <strong>✅ Licencja Aktywna</strong><br>
-                            Status: ${result.status}<br>
-                            Właściciel: ${result.owner || 'N/A'}<br>
-                            Wygasa: ${result.expires || 'N/A'}
+                            Status: ${result.message || 'Zweryfikowana'}<br>
+                            ${result.owner ? `Właściciel: ${result.owner}<br>` : ''}
+                            ${result.expires ? `Wygasa: ${result.expires}<br>` : ''}
+                            ${result.server_id ? `Server ID: ${result.server_id}` : ''}
                         </div>
                     `;
                 } else {
                     resultDiv.innerHTML = `
                         <div style="background: #f8d7da; padding: 15px; border-radius: 8px; color: #721c24;">
                             <strong>❌ Licencja Nieaktywna</strong><br>
-                            Status: ${result.status}<br>
-                            Powód: ${result.reason || 'Nieznany'}
+                            Powód: ${result.message || result.error || 'Nieznany'}
                         </div>
                     `;
-                }
-            } catch (error) {
-                showAlert('❌ Błąd: ' + error.message, 'error');
-            }
-        });
-
-        // Zarządzaj licencją
-        document.getElementById('manageLicenseForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const action = document.getElementById('action').value;
-            const data = {
-                license_key: document.getElementById('manageKey').value,
-                reason: document.getElementById('reason').value || 'Brak powodu'
-            };
-
-            const endpoint = action === 'disable' ? '/api/admin/disable-license' : '/api/admin/enable-license';
-
-            try {
-                const response = await fetch(`${getApiUrl()}${endpoint}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    showAlert(`✅ Licencja ${action === 'disable' ? 'wyłączona' : 'włączona'}!`, 'success');
-                    e.target.reset();
-                    loadLicenses();
-                } else {
-                    showAlert('❌ Błąd: ' + result.error, 'error');
                 }
             } catch (error) {
                 showAlert('❌ Błąd: ' + error.message, 'error');
@@ -569,7 +474,7 @@
         // Załaduj wszystkie licencje
         async function loadLicenses() {
             try {
-                const response = await fetch(`${getApiUrl()}/api/admin/list-licenses`);
+                const response = await fetch(`${getApiUrl()}/api/licenses`);
                 const result = await response.json();
 
                 const listDiv = document.getElementById('licensesList');
@@ -577,49 +482,23 @@
                 if (result.licenses && result.licenses.length > 0) {
                     listDiv.innerHTML = result.licenses.map(lic => `
                         <div class="license-item ${lic.active ? '' : 'disabled'}">
-                            <h3>🔑 ${lic.key}</h3>
+                            <h3>🔑 ${lic.license_key || lic.key}</h3>
                             <div class="license-info">
-                                <p><strong>Status:</strong> <span class="status ${lic.active ? 'active' : 'disabled'}">${lic.status}</span></p>
-                                <p><strong>Właściciel:</strong> ${lic.owner}</p>
-                                <p><strong>Server ID:</strong> ${lic.server_id}</p>
-                                <p><strong>Wygasa:</strong> ${lic.expires}</p>
-                                <p><strong>Ostatnie sprawdzenie:</strong> ${lic.last_check || 'Nigdy'}</p>
-                            </div>
-                            <div class="license-actions">
-                                <button class="btn-${lic.active ? 'danger' : 'success'}" 
-                                        onclick="toggleLicense('${lic.key}', ${lic.active})">
-                                    ${lic.active ? '🚫 Wyłącz' : '✅ Włącz'}
-                                </button>
+                                <p><strong>Status:</strong> <span class="status ${lic.active ? 'active' : 'disabled'}">${lic.active ? 'Aktywna' : 'Nieaktywna'}</span></p>
+                                ${lic.owner ? `<p><strong>Właściciel:</strong> ${lic.owner}</p>` : ''}
+                                ${lic.server_id ? `<p><strong>Server ID:</strong> ${lic.server_id}</p>` : ''}
+                                ${lic.expires ? `<p><strong>Wygasa:</strong> ${lic.expires}</p>` : ''}
+                                ${lic.created_at ? `<p><strong>Utworzono:</strong> ${lic.created_at}</p>` : ''}
                             </div>
                         </div>
                     `).join('');
+                } else if (result.error) {
+                    listDiv.innerHTML = `<p style="text-align: center; color: #dc3545;">❌ Błąd: ${result.error}</p>`;
                 } else {
                     listDiv.innerHTML = '<p style="text-align: center; color: #666;">Brak licencji w systemie</p>';
                 }
             } catch (error) {
                 showAlert('❌ Błąd ładowania: ' + error.message, 'error');
-            }
-        }
-
-        async function toggleLicense(key, isActive) {
-            const action = isActive ? 'disable' : 'enable';
-            const endpoint = `/api/admin/${action}-license`;
-
-            try {
-                const response = await fetch(`${getApiUrl()}${endpoint}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ license_key: key, reason: 'Zmiana z panelu' })
-                });
-
-                if (response.ok) {
-                    showAlert(`✅ Licencja ${action === 'disable' ? 'wyłączona' : 'włączona'}!`, 'success');
-                    loadLicenses();
-                } else {
-                    showAlert('❌ Błąd zmiany statusu', 'error');
-                }
-            } catch (error) {
-                showAlert('❌ Błąd: ' + error.message, 'error');
             }
         }
     </script>
