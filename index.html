@@ -1,1 +1,496 @@
 
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MncraftCore - Panel Licencji</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .api-url {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .api-url input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .license-list {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .license-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 5px solid #667eea;
+        }
+
+        .license-item.disabled {
+            border-left-color: #dc3545;
+            opacity: 0.7;
+        }
+
+        .license-item h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .license-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .license-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .license-info strong {
+            color: #333;
+        }
+
+        .license-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .license-actions button {
+            flex: 1;
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.disabled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 MncraftCore - Panel Licencji</h1>
+
+        <div class="api-url">
+            <strong>🌐 API URL:</strong>
+            <input type="text" id="apiUrl" value="https://mncraftcore-license-api.onrender.com" placeholder="https://twoj-api.com">
+        </div>
+
+        <div id="alertBox" class="alert"></div>
+
+        <div class="cards">
+            <!-- Dodaj nową licencję -->
+            <div class="card">
+                <h2>➕ Dodaj Licencję</h2>
+                <form id="addLicenseForm">
+                    <div class="form-group">
+                        <label>Klucz Licencji:</label>
+                        <input type="text" id="licenseKey" placeholder="TEST-1234-5678-ABCD" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Server ID:</label>
+                        <input type="text" id="serverId" placeholder="test-server-001" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Właściciel:</label>
+                        <input type="text" id="owner" placeholder="Nazwa Firmy" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Data Wygaśnięcia:</label>
+                        <input type="date" id="expires" required>
+                    </div>
+                    <button type="submit">Dodaj Licencję</button>
+                </form>
+            </div>
+
+            <!-- Sprawdź licencję -->
+            <div class="card">
+                <h2>🔍 Sprawdź Licencję</h2>
+                <form id="checkLicenseForm">
+                    <div class="form-group">
+                        <label>Klucz Licencji:</label>
+                        <input type="text" id="checkKey" placeholder="TEST-1234-5678-ABCD" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Server ID:</label>
+                        <input type="text" id="checkServerId" placeholder="test-server-001" required>
+                    </div>
+                    <button type="submit">Sprawdź</button>
+                </form>
+                <div id="checkResult" style="margin-top: 15px;"></div>
+            </div>
+
+            <!-- Zarządzaj licencją -->
+            <div class="card">
+                <h2>⚙️ Zarządzaj Licencją</h2>
+                <form id="manageLicenseForm">
+                    <div class="form-group">
+                        <label>Klucz Licencji:</label>
+                        <input type="text" id="manageKey" placeholder="TEST-1234-5678-ABCD" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Akcja:</label>
+                        <select id="action" required>
+                            <option value="">-- Wybierz --</option>
+                            <option value="disable">Wyłącz</option>
+                            <option value="enable">Włącz</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Powód:</label>
+                        <input type="text" id="reason" placeholder="Np. Brak płatności">
+                    </div>
+                    <button type="submit">Wykonaj</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Lista licencji -->
+        <div class="license-list">
+            <h2 style="color: #667eea; margin-bottom: 20px;">📋 Wszystkie Licencje</h2>
+            <button onclick="loadLicenses()" style="margin-bottom: 20px; width: auto; padding: 10px 30px;">
+                🔄 Odśwież Listę
+            </button>
+            <div id="licensesList"></div>
+        </div>
+    </div>
+
+    <script>
+        const getApiUrl = () => document.getElementById('apiUrl').value;
+
+        function showAlert(message, type = 'success') {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.textContent = message;
+            alertBox.className = `alert ${type} show`;
+            setTimeout(() => alertBox.classList.remove('show'), 5000);
+        }
+
+        // Ustaw domyślną datę (za 1 rok)
+        document.addEventListener('DOMContentLoaded', () => {
+            const expiresInput = document.getElementById('expires');
+            const nextYear = new Date();
+            nextYear.setFullYear(nextYear.getFullYear() + 1);
+            expiresInput.value = nextYear.toISOString().split('T')[0];
+        });
+
+        // Dodaj licencję
+        document.getElementById('addLicenseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const data = {
+                license_key: document.getElementById('licenseKey').value,
+                server_id: document.getElementById('serverId').value,
+                owner: document.getElementById('owner').value,
+                expires: document.getElementById('expires').value
+            };
+
+            try {
+                const response = await fetch(`${getApiUrl()}/api/admin/add-license`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showAlert('✅ Licencja dodana pomyślnie!', 'success');
+                    e.target.reset();
+                    loadLicenses();
+                } else {
+                    showAlert('❌ Błąd: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('❌ Błąd połączenia: ' + error.message, 'error');
+            }
+        });
+
+        // Sprawdź licencję
+        document.getElementById('checkLicenseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const data = {
+                license_key: document.getElementById('checkKey').value,
+                server_id: document.getElementById('checkServerId').value
+            };
+
+            try {
+                const response = await fetch(`${getApiUrl()}/api/license/check`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                const resultDiv = document.getElementById('checkResult');
+
+                if (result.valid) {
+                    resultDiv.innerHTML = `
+                        <div style="background: #d4edda; padding: 15px; border-radius: 8px; color: #155724;">
+                            <strong>✅ Licencja Aktywna</strong><br>
+                            Status: ${result.status}<br>
+                            Właściciel: ${result.owner || 'N/A'}<br>
+                            Wygasa: ${result.expires || 'N/A'}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="background: #f8d7da; padding: 15px; border-radius: 8px; color: #721c24;">
+                            <strong>❌ Licencja Nieaktywna</strong><br>
+                            Status: ${result.status}<br>
+                            Powód: ${result.reason || 'Nieznany'}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                showAlert('❌ Błąd: ' + error.message, 'error');
+            }
+        });
+
+        // Zarządzaj licencją
+        document.getElementById('manageLicenseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const action = document.getElementById('action').value;
+            const data = {
+                license_key: document.getElementById('manageKey').value,
+                reason: document.getElementById('reason').value || 'Brak powodu'
+            };
+
+            const endpoint = action === 'disable' ? '/api/admin/disable-license' : '/api/admin/enable-license';
+
+            try {
+                const response = await fetch(`${getApiUrl()}${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showAlert(`✅ Licencja ${action === 'disable' ? 'wyłączona' : 'włączona'}!`, 'success');
+                    e.target.reset();
+                    loadLicenses();
+                } else {
+                    showAlert('❌ Błąd: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('❌ Błąd: ' + error.message, 'error');
+            }
+        });
+
+        // Załaduj wszystkie licencje
+        async function loadLicenses() {
+            try {
+                const response = await fetch(`${getApiUrl()}/api/admin/list-licenses`);
+                const result = await response.json();
+
+                const listDiv = document.getElementById('licensesList');
+
+                if (result.licenses && result.licenses.length > 0) {
+                    listDiv.innerHTML = result.licenses.map(lic => `
+                        <div class="license-item ${lic.active ? '' : 'disabled'}">
+                            <h3>🔑 ${lic.key}</h3>
+                            <div class="license-info">
+                                <p><strong>Status:</strong> <span class="status ${lic.active ? 'active' : 'disabled'}">${lic.status}</span></p>
+                                <p><strong>Właściciel:</strong> ${lic.owner}</p>
+                                <p><strong>Server ID:</strong> ${lic.server_id}</p>
+                                <p><strong>Wygasa:</strong> ${lic.expires}</p>
+                                <p><strong>Ostatnie sprawdzenie:</strong> ${lic.last_check || 'Nigdy'}</p>
+                            </div>
+                            <div class="license-actions">
+                                <button class="btn-${lic.active ? 'danger' : 'success'}" 
+                                        onclick="toggleLicense('${lic.key}', ${lic.active})">
+                                    ${lic.active ? '🚫 Wyłącz' : '✅ Włącz'}
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    listDiv.innerHTML = '<p style="text-align: center; color: #666;">Brak licencji w systemie</p>';
+                }
+            } catch (error) {
+                showAlert('❌ Błąd ładowania: ' + error.message, 'error');
+            }
+        }
+
+        async function toggleLicense(key, isActive) {
+            const action = isActive ? 'disable' : 'enable';
+            const endpoint = `/api/admin/${action}-license`;
+
+            try {
+                const response = await fetch(`${getApiUrl()}${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ license_key: key, reason: 'Zmiana z panelu' })
+                });
+
+                if (response.ok) {
+                    showAlert(`✅ Licencja ${action === 'disable' ? 'wyłączona' : 'włączona'}!`, 'success');
+                    loadLicenses();
+                } else {
+                    showAlert('❌ Błąd zmiany statusu', 'error');
+                }
+            } catch (error) {
+                showAlert('❌ Błąd: ' + error.message, 'error');
+            }
+        }
+
+        // Załaduj licencje przy starcie
+        loadLicenses();
+    </script>
+</body>
+</html>
